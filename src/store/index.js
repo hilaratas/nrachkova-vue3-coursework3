@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import filter from './modules/filter'
 
 export default createStore({
   state() {
@@ -11,9 +12,10 @@ export default createStore({
       state.tasks =  JSON.parse(localStorage.getItem('tasks')) || []
     },
     taskAdd(state, newTask) {
-      state.tasks.push(newTask)
-      localStorage.setItem('tasks', JSON.stringify(state.tasks))
-      //state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
+      let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+      tasks.push(newTask)
+      localStorage.setItem('tasks', JSON.stringify(tasks))
+      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
     },
     taskChange(state, task) {
       let index = state.tasks.findIndex( t => t.id === +task.id)
@@ -22,7 +24,7 @@ export default createStore({
 
       state.tasks[index] = task
       localStorage.setItem('tasks', JSON.stringify(state.tasks))
-      //state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
+      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
     },
     taskRemove(state, taskId) {
       let index = state.tasks.findIndex( t => +t.id === +taskId)
@@ -31,7 +33,7 @@ export default createStore({
 
       state.tasks.splice(index, 1)
       localStorage.setItem('tasks', JSON.stringify(state.tasks))
-      //state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
+      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
     }
   },
   actions: {
@@ -49,13 +51,20 @@ export default createStore({
     activeCounter(state) {
       return state.tasks.filter( e => { return e.status === 'active' }).length
     },
+    tasksCounter(state) {
+      return state.tasks.length
+    },
     tasks(state) {
       return state.tasks
+    },
+    tasksFromStorage(state) {
+      return JSON.parse(localStorage.getItem('tasks')) || []
     },
     taskById(state) {
       return id => {
         return state.tasks.find(t => t.id === +id);
       }
     }
-  }
+  },
+  modules: filter
 })

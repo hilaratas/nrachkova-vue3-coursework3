@@ -1,59 +1,66 @@
 <template>
+  <tasks-filter
+      @tasks-filter="onUpdateFilter($event)"
+  ></tasks-filter>
   <template v-if="tasks.length === 0">
     <h1 class="text-white center">Задач пока нет</h1>
   </template>
   <template v-else>
-    <h3 class="text-white">Всего активных задач: {{activeCounter}}</h3>
-    <div class="card">
-      <div v-for="(task, idx) in tasks" :key="task.id">
-        <h2>{{ idx+1 }}</h2>
-        <h2 class="card-title">
-          {{ task.title }}
-          <AppStatus :type="task.status" />
-        </h2>
-        <div>
-          <strong> Дата создания:</strong> <small>{{ dateFilter(task.createDate) }}</small>
-        </div>
-        <div>
-          <strong> Дата deadline:</strong> <small>{{ dateFilter(task.deadline) }}</small>
-        </div>
-        <div><strong>Описание задачи:</strong></div>
-        <div>
-          {{ task.description}}
-        </div>
-        <br>
-        <button class="btn primary" @click="$router.push('/task/' + task.id)">Посмотреть</button>
-        <button class="btn danger" @click="showConfirm=true; removableTaskId=task.id">Удалить</button>
+    <h3 class="text-white">Всего задач: {{ tasksCounter }}</h3>
+    <h3 class="text-white">Задач, соответсвующих фильтру: {{ filteredTasksCounter }}</h3>
+
+    <div class="card" v-if="filteredTasks.length">
+      <div v-for="(task, idx) in filteredTasks" :key="task.id">
+        <task-item
+            :task="task"
+            :index="idx"
+            @click-delete="onClickDelete"
+        ></task-item>
       </div>
     </div>
+
   </template>
   <teleport to="#modals">
     <app-modal
         v-if="showConfirm"
         @close="showConfirm=false; removableTaskId=null"
         @send-confirm="onConfirm($event, removableTaskId)">
+      <h3>Подтвердить удаление задачи <small>ID={{removableTaskId}}</small>?</h3>
+      <template #confirm>да, удалить</template>
+      <template #reject>нет, не удалять</template>
     </app-modal>
   </teleport>
 </template>
 
 <script>
-import AppStatus from '../components/AppStatus'
 import AppModal from '../components/AppModal'
+import TasksFilter from "@/components/TasksFilter";
+import TaskItem from '@/components/TasksItem';
+import {FILTER_DEFAULT} from '@/settings';
+
 
 export default {
   data() {
     return {
       showConfirm: false,
-      removableTaskId: null
+      removableTaskId: null,
+      filter: FILTER_DEFAULT,
+      filteredTasks: []
     }
   },
   computed: {
     tasks() {
       return this.$store.state.tasks
     },
-    activeCounter() {
-      return this.$store.getters.activeCounter;
+    tasksCounter() {
+      return this.$store.getters.tasksCounter;
+    },
+    filteredTasksCounter() {
+      return this.filteredTasks.length
     }
+  },
+  mounted() {
+    this.filteredTasks = this.filterTasks(this.tasks, this.filter)
   },
   methods: {
     onRemoveTask(taskId) {
@@ -65,10 +72,44 @@ export default {
 
       this.showConfirm = false
     },
-    dateFilter ( dateString ) {
-      return new Intl.DateTimeFormat().format(new Date(dateString))
+    onUpdateFilter(filter) {
+      this.filter = filter
+    },
+    onClickDelete($event) {
+      this.showConfirm = true;
+      this.removableTaskId = $event;
+    },
+    filterTasks(tasks, filter) {
+      let newTasks = tasks;
+      let params = Object.keys(filter);
+      params.forEach((p) => {
+        switch (p) {
+          case 'statuses':
+            if ( !filter.statuses.length)
+              break;
+
+            newTasks = newTasks.filter(nT => filter.statuses.includes(nT['status']))
+            break;
+          case 'description':
+          case 'title':
+            newTasks = newTasks.filter(nT => nT[p].includes(filter[p]))
+            break;
+        }
+      })
+      return newTasks
     }
   },
-  components: {AppStatus, AppModal}
+  watch: {
+    filter: {
+      deep: true,
+      handler(newFilter) {
+        this.filteredTasks = this.filterTasks(this.tasks, this.filter)
+      }
+    },
+    tasks() {
+      this.filteredTasks = this.filterTasks(this.tasks, this.filter)
+    }
+  },
+  components: {AppModal, TasksFilter, TaskItem}
 }
 </script>

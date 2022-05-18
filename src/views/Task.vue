@@ -11,7 +11,7 @@
       <div><strong> Дата создания:</strong> <small>{{ task.createDate }}</small></div>
       <div><strong>Дэдлайн</strong>: {{ task.deadline}}</div>
       <div><strong>Описание задачи:</strong></div>
-      <div>{{ task.description}}</div>
+      <div>{{ task.descriptionFetch}}</div>
       <br>
       <div>
         <button class="btn" @click="changeStatus('in-progress')">Взять в работу</button>

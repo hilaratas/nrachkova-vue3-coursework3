@@ -101,6 +101,11 @@ h3 {
     border-color: #999999;
 }
 
+.transparent-danger {
+    color: #e53935;
+    border-color: #e53935;
+}
+
 .btn:hover {
     cursor: pointer;
     opacity: 0.8;

@@ -1,11 +1,17 @@
 <template>
   <div class="modal-backdrop" @click="$emit('close')"></div>
   <div class="modal">
-    <h3>Вы хотите удалить эту задачу</h3>
+    <slot>
+      <h3>Подтвердить действие?</h3>
+    </slot>
     <div>
-      <button class="btn primary" @click="$emit('sendConfirm', false)">Не удалять</button>
+      <button class="btn primary" @click="$emit('sendConfirm', false)">
+        <slot name="reject">Нет</slot>
+      </button>
       &nbsp;&nbsp;
-      <button class="btn danger" @click="$emit('sendConfirm', true)">Удалить</button>
+      <button class="btn danger" @click="$emit('sendConfirm', true)">
+        <slot name="confirm">Да</slot>
+      </button>
     </div>
   </div>
 </template>

@@ -16,5 +16,15 @@ export const TASK_STATUS = {
   'cancelled': {
     name: 'отменено',
     class: 'danger'
+  },
+  'expired': {
+    name: 'просроченный',
+    class: 'transparent-danger'
   }
+}
+
+export const FILTER_DEFAULT = {
+  statuses: [],
+  title: '',
+  description: ''
 }

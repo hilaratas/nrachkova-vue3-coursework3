@@ -41,7 +41,7 @@ export default {
       const createDate = new Date()
       const deadlineDate = new Date(this.task.deadline)
       deadlineDate.setHours(23, 59,59)
-      const status = deadlineDate > createDate ? 'active' : 'cancelled'
+      const status = deadlineDate > createDate ? 'active' : 'expired'
       const newTask = { id: +createDate, ...this.task, createDate, status}
       this.$store.dispatch('taskAdd', newTask)
       this.$router.push('/')
