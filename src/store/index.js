@@ -1,50 +1,11 @@
 import { createStore } from 'vuex'
 import filter from './modules/filter'
+import {parseLocalStorage, setLocalStorage} from '@/utility/localStorage-utility'
 
 export default createStore({
   state() {
     return {
       tasks: JSON.parse(localStorage.getItem('tasks')) || []
-    }
-  },
-  mutations: {
-    tasksFetch(state) {
-      state.tasks =  JSON.parse(localStorage.getItem('tasks')) || []
-    },
-    taskAdd(state, newTask) {
-      let tasks = JSON.parse(localStorage.getItem('tasks')) || []
-      tasks.push(newTask)
-      localStorage.setItem('tasks', JSON.stringify(tasks))
-      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    },
-    taskChange(state, task) {
-      let index = state.tasks.findIndex( t => t.id === +task.id)
-      if ( index === -1 )
-        return
-
-      state.tasks[index] = task
-      localStorage.setItem('tasks', JSON.stringify(state.tasks))
-      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    },
-    taskRemove(state, taskId) {
-      let index = state.tasks.findIndex( t => +t.id === +taskId)
-      if ( index === -1 )
-        return
-
-      state.tasks.splice(index, 1)
-      localStorage.setItem('tasks', JSON.stringify(state.tasks))
-      state.tasks = JSON.parse(localStorage.getItem('tasks')) || []
-    }
-  },
-  actions: {
-    taskAdd({commit}, newTask) {
-      commit('taskAdd', newTask)
-    },
-    taskChange({commit}, task) {
-      commit('taskChange', task)
-    },
-    taskRemove({commit}, taskId) {
-      commit('taskRemove', taskId)
     }
   },
   getters: {
@@ -66,5 +27,54 @@ export default createStore({
       }
     }
   },
-  modules: filter
+  mutations: {
+    tasksFetch(state) {
+      const tasks = parseLocalStorage('tasks') || []
+      tasks.forEach((t) => {
+        let deadlineDate = new Date(t.deadline)
+        deadlineDate.setHours(23, 59,59)
+        return {...t,
+          status: (deadlineDate < new Date() ? 'expired' : t.status)
+        }
+
+      })
+      state.tasks = tasks
+    },
+    taskAdd(state, newTask) {
+      let tasks = parseLocalStorage('tasks') || []
+      tasks.push(newTask)
+      setLocalStorage('tasks', JSON.stringify(tasks))
+      state.tasks = parseLocalStorage('tasks')
+    },
+    taskChange(state, task) {
+      let index = state.tasks.findIndex( t => t.id === +task.id)
+      if ( index === -1 )
+        return
+
+      state.tasks[index] = task
+      setLocalStorage('tasks', JSON.stringify(state.tasks))
+      state.tasks = parseLocalStorage('tasks')
+    },
+    taskRemove(state, taskId) {
+      let index = state.tasks.findIndex( t => +t.id === +taskId)
+      if ( index === -1 )
+        return
+
+      state.tasks.splice(index, 1)
+      setLocalStorage('tasks', JSON.stringify(state.tasks))
+      state.tasks = JSON.parse(localStorage.getItem('tasks'))
+    }
+  },
+  actions: {
+    taskAdd({commit}, newTask) {
+      commit('taskAdd', newTask)
+    },
+    taskChange({commit}, task) {
+      commit('taskChange', task)
+    },
+    taskRemove({commit}, taskId) {
+      commit('taskRemove', taskId)
+    }
+  },
+  modules: { filter }
 })

@@ -1,6 +1,6 @@
 <template>
   <tasks-filter
-      @tasks-filter="onUpdateFilter($event)"
+      @update-filter="onUpdateFilter"
   ></tasks-filter>
   <template v-if="tasks.length === 0">
     <h1 class="text-white center">Задач пока нет</h1>
@@ -44,7 +44,7 @@ export default {
     return {
       showConfirm: false,
       removableTaskId: null,
-      filter: FILTER_DEFAULT,
+      params: FILTER_DEFAULT,
       filteredTasks: []
     }
   },
@@ -60,7 +60,7 @@ export default {
     }
   },
   mounted() {
-    this.filteredTasks = this.filterTasks(this.tasks, this.filter)
+    this.filteredTasks = this.filterTasks(this.tasks, this.params)
   },
   methods: {
     onRemoveTask(taskId) {
@@ -72,8 +72,8 @@ export default {
 
       this.showConfirm = false
     },
-    onUpdateFilter(filter) {
-      this.filter = filter
+    onUpdateFilter() {
+      this.params = this.$store.getters['filter/filter']
     },
     onClickDelete($event) {
       this.showConfirm = true;
@@ -100,14 +100,14 @@ export default {
     }
   },
   watch: {
-    filter: {
+    params: {
       deep: true,
       handler(newFilter) {
-        this.filteredTasks = this.filterTasks(this.tasks, this.filter)
+        this.filteredTasks = this.filterTasks(this.tasks, this.params)
       }
     },
     tasks() {
-      this.filteredTasks = this.filterTasks(this.tasks, this.filter)
+      this.filteredTasks = this.filterTasks(this.tasks, this.params)
     }
   },
   components: {AppModal, TasksFilter, TaskItem}

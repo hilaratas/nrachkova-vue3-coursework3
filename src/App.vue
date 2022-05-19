@@ -7,10 +7,16 @@
 
 <script>
 import TheNavbar from './components/TheNavbar'
+import {mapMutations} from 'vuex'
 
 export default {
-  onMounted() {
-    this.$store.commit('tasksFetch')
+  methods: {
+    ...mapMutations(['tasksFetch']),
+    ...mapMutations('filter', ['filterFetch'])
+  },
+  mounted() {
+    this.tasksFetch()
+    this.filterFetch()
   },
   components: {
     TheNavbar

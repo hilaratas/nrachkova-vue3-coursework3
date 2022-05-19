@@ -1,4 +1,4 @@
-import {parseLocalStorage} from '@/utility/filter-mixin'
+import {parseLocalStorage, setLocalStorage} from '@/utility/localStorage-utility'
 import {FILTER_DEFAULT} from '@/settings'
 
 export default {
@@ -15,39 +15,16 @@ export default {
   },
   mutations: {
     filterFetch(state) {
-      const filter = parseLocalStorage() || FILTER_DEFAULT;
+      state.filter = parseLocalStorage('filter') || FILTER_DEFAULT;
     },
-    statusesFetch(state) {
-      const filter = parseLocalStorage();
-      return filter && filter.statuses ? filters.statuses : []
-    },
-    titleFetch(state) {
-      const filter = parseLocalStorage();
-      return filter && filter.title ? filter.title : []
-    },
-    descriptionFetch(state) {
-      const filter = parseLocalStorage();
-      return filter && filter.description ? filter.description : []
-    },
-    statusesChange(state, newStatuses) {
-      state.statuses = newStatuses
-    },
-    titleChange(state, newTitle) {
-      state.statuses = newTitle
-    },
-    descriptionChange(state, newDescription) {
-      state.statuses = newDescription
+    filterChange(state, newParams) {
+      setLocalStorage('filter', JSON.stringify(newParams))
+      state.filter = newParams
     }
   },
   actions: {
-    statusesChange({commit}, newStatuses) {
-      commit('statusesChange', newStatuses)
-    },
-    titleChange({commit}, newTitle) {
-      commit('titleChange', newTitle)
-    },
-    descriptionChange({commit}, newDescription) {
-      commit('titleChange', newDescription)
+    filterChange({commit}, newParams) {
+      commit('filterChange', newParams)
     }
   }
 }

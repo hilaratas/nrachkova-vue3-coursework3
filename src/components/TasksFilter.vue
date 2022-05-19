@@ -26,20 +26,27 @@
 import {TASK_STATUS}  from '@/settings'
 import AppStatus from "@/components/AppStatus";
 import {FILTER_DEFAULT} from '@/settings'
+import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
 
 export default {
   name: "TasksFilter",
+  emits: ['updateFilter'],
   data() {
     return {
-      params: FILTER_DEFAULT
+      params: {...FILTER_DEFAULT},
     }
+  },
+  mounted() {
+    this.params = this.$store.getters['filter/filter']
   },
   beforeCreate() {
     this.allStatuses = Object.keys(TASK_STATUS)
   },
   methods: {
+    ...mapActions('filter', ['filterChange']),
     onSubmit() {
-      this.$emit('tasksFilter', this.params)
+      this.filterChange({...this.params})
+      this.$emit('updateFilter')
     }
   },
   components: {AppStatus}
