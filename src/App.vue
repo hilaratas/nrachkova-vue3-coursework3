@@ -11,12 +11,10 @@ import {mapMutations} from 'vuex'
 
 export default {
   methods: {
-    ...mapMutations(['tasksFetch']),
-    ...mapMutations('filter', ['filterFetch'])
+    ...mapMutations(['tasksFetch'])
   },
   mounted() {
     this.tasksFetch()
-    this.filterFetch()
   },
   components: {
     TheNavbar

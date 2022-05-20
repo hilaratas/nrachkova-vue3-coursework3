@@ -26,7 +26,7 @@
 import {TASK_STATUS}  from '@/settings'
 import AppStatus from "@/components/AppStatus";
 import {FILTER_DEFAULT} from '@/settings'
-import {mapState, mapActions, mapMutations, mapGetters} from 'vuex'
+import {mapActions} from 'vuex'
 
 export default {
   name: "TasksFilter",
@@ -36,11 +36,11 @@ export default {
       params: {...FILTER_DEFAULT},
     }
   },
-  mounted() {
-    this.params = this.$store.getters['filter/filter']
-  },
   beforeCreate() {
     this.allStatuses = Object.keys(TASK_STATUS)
+  },
+  mounted() {
+    this.filterFetch().then(res => this.params = res)
   },
   methods: {
     ...mapActions('filter', ['filterChange']),

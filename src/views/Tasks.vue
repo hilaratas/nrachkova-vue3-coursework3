@@ -37,6 +37,7 @@ import AppModal from '../components/AppModal'
 import TasksFilter from "@/components/TasksFilter";
 import TaskItem from '@/components/TasksItem';
 import {FILTER_DEFAULT} from '@/settings';
+import {mapActions} from 'vuex';
 
 
 export default {
@@ -60,9 +61,11 @@ export default {
     }
   },
   mounted() {
+    this.filterFetch().then(res => this.params = res)
     this.filteredTasks = this.filterTasks(this.tasks, this.params)
   },
   methods: {
+    ...mapActions('filter', ['filterFetch']),
     onRemoveTask(taskId) {
       this.$store.dispatch('taskRemove', taskId);
     },
@@ -73,7 +76,7 @@ export default {
       this.showConfirm = false
     },
     onUpdateFilter() {
-      this.params = this.$store.getters['filter/filter']
+      this.filterFetch().then(res => this.params = res)
     },
     onClickDelete($event) {
       this.showConfirm = true;
@@ -102,7 +105,7 @@ export default {
   watch: {
     params: {
       deep: true,
-      handler(newFilter) {
+      handler() {
         this.filteredTasks = this.filterTasks(this.tasks, this.params)
       }
     },
